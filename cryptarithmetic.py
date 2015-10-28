@@ -131,8 +131,7 @@ def compile_word(word):
     else:
         return word
 
-
-def compile_formula(formula, verbose=False):
+def my_compile_formula(formula, verbose=False):
     """Compile formula into a function. Also return letters found, as a str,
     in same order as parms of function. The first digit of a multi-digit 
     number can't be 0. So if YOU is a word in the formula, and the function
@@ -142,6 +141,8 @@ def compile_formula(formula, verbose=False):
     
     letters = ''.join(set(re.findall('[A-Z]', formula)))
     parms = ', '.join(letters)
+    # the plus below is important so there is atleast two digits, because
+    # a single digit 0 is ok
     var_tokens = re.split('([A-Z]+)',formula)
     # lambda is one line statement like this. True if x == 0 else False        
     # build up check for 0 in first digit of each term
@@ -158,6 +159,26 @@ def compile_formula(formula, verbose=False):
     body = ''.join(tokens)
     #print body
     f = 'lambda %s: %s' % (parms, check_octal+body)
+    if verbose: print f
+    return eval(f), letters
+
+def compile_formula(formula, verbose=False):
+    """Compile formula into a function. Also return letters found, as a str,
+    in same order as parms of function. The first digit of a multi-digit 
+    number can't be 0. So if YOU is a word in the formula, and the function
+    is called with Y eqal to 0, the function should return False."""
+    
+    # modify the code in this function.
+    
+    letters = ''.join(set(re.findall('[A-Z]', formula)))
+    firstletters = set(re.findall(r'\b([A-Z])[A-Z]', formula))
+    parms = ', '.join(letters)
+    tokens = map(compile_word, re.split('([A-Z]+)', formula))
+    body = ''.join(tokens)
+    if firstletters:
+        tests = ' and '.join(L+'!=' for L in firstletters)
+        body = '%s and (%s)' % (tests, body)
+    f = 'lambda %s: %s' % (parms, body)
     if verbose: print f
     return eval(f), letters
 
