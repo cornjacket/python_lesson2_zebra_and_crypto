@@ -8,7 +8,7 @@ def is_adjacent_to(f1, f2):
     "Two floors are adjacent to each other if they differ by 1."
     return abs(f1-f2) == 1
 
-def floor_puzzle():
+def my_floor_puzzle():
     "Return a tuple (hopper,kay,liskov,perlis,ritchie) numbers."
     floors = bottom, _, _, _, top = [1, 2, 3, 4, 5]
     orderings = list(itertools.permutations(floors)) # 1
@@ -21,6 +21,20 @@ def floor_puzzle():
                 if not is_adjacent_to(ritchie, liskov)
                 if not is_adjacent_to(liskov, kay)
                 ))
+
+def floor_puzzle():
+    "Return a tuple (hopper,kay,liskov,perlis,ritchie) numbers."
+    floors = bottom, _, _, _, top = [1, 2, 3, 4, 5]
+    orderings = list(itertools.permutations(floors))
+    for (hopper, kay, liskov, perlis, ritchie) in orderings:
+        if (hopper is not top
+            and kay is not bottom
+            and liskov is not top
+            and liskov is not bottom
+            and perlis > kay
+            and abs(ritchie - liskov) > 1
+            and abs(liskov - kay) >1):
+            return [hopper, kay, liskov, perlis, ritchie]            
 
 import time
 
