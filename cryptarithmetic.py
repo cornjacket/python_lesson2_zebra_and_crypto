@@ -115,6 +115,7 @@ def my_compile_word(word):
         result += str(power)+'*'+digit
         power *= 10
     result += ')'
+    #print result
     return result
 
 def compile_word(word):
@@ -130,14 +131,47 @@ def compile_word(word):
     else:
         return word
 
-print compile_word("HELLO")
-print compile_word("H")
-print compile_word("and")
 
-word = "ALL"
-if all(c.isupper() for c in word): print word
+def compile_formula(formula, verbose=False):
+    """Compile formula into a function. Also return letters found, as a str,
+    in same order as parms of function. The first digit of a multi-digit 
+    number can't be 0. So if YOU is a word in the formula, and the function
+    is called with Y eqal to 0, the function should return False."""
+    
+    # modify the code in this function.
+    
+    letters = ''.join(set(re.findall('[A-Z]', formula)))
+    parms = ', '.join(letters)
+    var_tokens = re.split('([A-Z]+)',formula)
+    # lambda is one line statement like this. True if x == 0 else False        
+    # build up check for 0 in first digit of each term
+    check_octal = ''
+    for idx,var_token in enumerate(var_tokens):
+        if var_token.isupper():
+            #print var_token
+            if check_octal == '': check_octal = 'False if '+var_token[0]+' == 0'
+            else: check_octal += ' or '+var_token[0]+' == 0'
+    if check_octal != '':
+        check_octal += ' else '
+    #print check_octal
+    tokens = map(compile_word, re.split('([A-Z]+)', formula))
+    body = ''.join(tokens)
+    #print body
+    f = 'lambda %s: %s' % (parms, check_octal+body)
+    if verbose: print f
+    return eval(f), letters
 
-word = "AnL"
-if all(c.isupper() for c in word): print word
+print my_compile_word("HELLO")
+print my_compile_word("H")
+print my_compile_word("and")
 
-test()
+#word = "ALL"
+#if all(c.isupper() for c in word): print word
+
+#word = "AnL"
+#if all(c.isupper() for c in word): print word
+
+##test() # this will run test() and show profiling
+
+
+print compile_formula("YOU == YOU")
